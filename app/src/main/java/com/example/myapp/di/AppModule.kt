@@ -21,6 +21,7 @@ import com.example.myapp.presentation.photodetail.PhotoDetailViewModel
 import com.example.myapp.presentation.social.SocialViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import com.example.myapp.domain.usecase.*
 
 val appModule = module {
     // Repositories
@@ -38,11 +39,17 @@ val appModule = module {
     factory { GetMissingPhotoInfoUseCase(get()) }
     factory { UpdateMemoryPhotoUseCase(get()) }
     factory { GetMemoryUseCase(get()) }
+    // Social
+    factory { GetDiscoveryUsersUseCase(get()) }
+    factory { GetFriendsUseCase(get()) }
+    factory { GetDiscoveryCommunitiesUseCase(get()) }
+    factory { AddFriendUseCase(get()) }
+    factory { JoinCommunityUseCase(get()) }
 
     // ViewModels
     viewModel { HomeViewModel(get(), get()) }
     viewModel { CameraViewModel(get()) }
     viewModel { PhotoDetailViewModel(get(), get(), get(), get(), get(), get()) }
-    viewModel { SocialViewModel(get()) }
+    viewModel { SocialViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { PhotoCompositionViewModel(get()) }
 }
