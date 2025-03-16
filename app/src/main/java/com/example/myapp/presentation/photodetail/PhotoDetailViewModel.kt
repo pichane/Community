@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
 class PhotoDetailViewModel(
     private val getPhotoByIdUseCase: GetPhotoByIdUseCase,
     private val deletePhotoUseCase: DeletePhotoUseCase,
@@ -32,34 +33,47 @@ class PhotoDetailViewModel(
     private val addMemoryToCommunityUseCase: AddMemoryToCommunityUseCase
 ) : ViewModel() {
 
-    private val _photo = MutableStateFlow<Photo?>(null)
-    val photo: StateFlow<Photo?> = _photo.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    private val _missingPhotoInfo = MutableStateFlow<List<MissingPhotoInfo>>(emptyList())
-    val missingPhotoInfo: StateFlow<List<MissingPhotoInfo>> = _missingPhotoInfo.asStateFlow()
-
-    // Add user communities state
-    val userCommunities: StateFlow<List<Community>> = getUserCommunitiesUseCase()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
+    // Unified UI state
     private val _uiState = MutableStateFlow(PhotoDetailUiState())
     val uiState: StateFlow<PhotoDetailUiState> = _uiState.asStateFlow()
 
+    // Keep communities as a separate flow from domain layer
+    private val userCommunitiesFlow =
+        getUserCommunitiesUseCase().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
     init {
         loadMissingPhotoInfo()
+        observeCommunities()
     }
 
-    fun loadPhoto(photoId: Int) {
+    fun onEvent(event: PhotoDetailEvent) {
+        when (event) {
+            is PhotoDetailEvent.LoadPhoto -> loadPhoto(event.photoId)
+            is PhotoDetailEvent.DeletePhoto -> deletePhoto(event.photoId)
+            is PhotoDetailEvent.UpdateMissingPhoto -> updateMissingPhotoWithCurrentPhoto(
+                event.missingPhotoInfo, event.currentPhotoUri
+            )
+
+            is PhotoDetailEvent.UpdateAllMissingPhotos -> updateAllMissingPhotos(event.currentPhotoUri)
+            is PhotoDetailEvent.CreateEvent -> createNewEventWithPhoto(
+                event.communityId, event.photoUri
+            )
+
+            PhotoDetailEvent.ShowCommunitySelector -> showCommunitySelector()
+            PhotoDetailEvent.DismissCommunitySelector -> dismissCommunitySelector()
+            PhotoDetailEvent.NavigationHandled -> clearNavigationEvent()
+        }
+    }
+
+    private fun loadPhoto(photoId: Int) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             try {
+                _uiState.update { it.copy(isLoading = true) }
+
                 val photo = getPhotoByIdUseCase(photoId)
                 _uiState.update { it.copy(photo = photo, isLoading = false) }
             } catch (e: Exception) {
-                Log.e("PhotoDetailViewModel", "Error loading photo", e)
+                handleError(e, "Error loading photo")
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
@@ -68,32 +82,53 @@ class PhotoDetailViewModel(
     private fun loadMissingPhotoInfo() {
         viewModelScope.launch {
             try {
-                _missingPhotoInfo.value = getMissingPhotoInfoUseCase()
+                val missingInfo = getMissingPhotoInfoUseCase()
+                _uiState.update { it.copy(missingPhotoInfo = missingInfo) }
             } catch (e: Exception) {
-                // Handle error
+                handleError(e, "Error loading missing photo info")
             }
         }
     }
 
-    fun deletePhoto(photoId: Int) {
+    private fun observeCommunities() {
+        viewModelScope.launch {
+            userCommunitiesFlow.collect { communities ->
+                _uiState.update { it.copy(userCommunities = communities) }
+            }
+        }
+    }
+
+    private fun deletePhoto(photoId: Int) {
         viewModelScope.launch {
             try {
+                _uiState.update { it.copy(isLoading = true) }
+
                 deletePhotoUseCase(photoId)
-                // Photo deleted successfully
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false, navigationEvent = NavigationEvent.PhotoDeleted
+                    )
+                }
             } catch (e: Exception) {
-                // Handle error
+                handleError(e, "Error deleting photo")
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
-    fun updateMissingPhotoWithCurrentPhoto(
-        missingPhotoInfo: MissingPhotoInfo,
-        currentPhotoUri: String
+    private fun updateMissingPhotoWithCurrentPhoto(
+        missingPhotoInfo: MissingPhotoInfo, currentPhotoUri: String
     ) {
         viewModelScope.launch {
             try {
+                _uiState.update { it.copy(isLoading = true) }
+
                 // Only proceed if we have a valid photo reference
-                val photoId = missingPhotoInfo.photo?.id ?: return@launch
+                val photoId = missingPhotoInfo.photo?.id ?: run {
+                    Log.w("PhotoDetailViewModel", "Missing photo ID")
+                    return@launch
+                }
 
                 // Update the memory photo with current photo URI
                 updateMemoryPhotoUseCase(
@@ -104,36 +139,56 @@ class PhotoDetailViewModel(
                 )
 
                 // Refresh the missing photo info list
-                _missingPhotoInfo.value = getMissingPhotoInfoUseCase()
+                val updatedMissingInfo = getMissingPhotoInfoUseCase()
+
+                _uiState.update {
+                    it.copy(
+                        missingPhotoInfo = updatedMissingInfo,
+                        isLoading = false,
+                        navigationEvent = NavigationEvent.NavigateBack
+                    )
+                }
             } catch (e: Exception) {
-                // Handle error
+                handleError(e, "Error updating missing photo")
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
-    fun createNewEventWithPhoto(communityId: String, photoUri: String) {
+    private fun createNewEventWithPhoto(communityId: String, photoUri: String) {
         viewModelScope.launch {
             try {
+                _uiState.update { it.copy(isLoading = true, showCommunitySelection = false) }
+
                 // Create event title based on date
                 val dateFormat = SimpleDateFormat("MMMM dd", Locale.getDefault())
                 val title = "Event on ${dateFormat.format(Date())}"
 
                 // Create a new memory in the community
                 addMemoryToCommunityUseCase(
-                    communityId = communityId,
-                    title = title,
-                    date = Date()
+                    communityId = communityId, title = title, date = Date()
                 )
 
-                // Get the most recently added memory - should be the first one
-                val community = userCommunities.value.find { it.id == communityId } ?: return@launch
-                if (community.memories.isEmpty()) return@launch
+                // Get the community with the new memory
+                val community = uiState.value.userCommunities.find { it.id == communityId } ?: run {
+                    Log.w("PhotoDetailViewModel", "Community not found")
+                    return@launch
+                }
 
+                if (community.memories.isEmpty()) {
+                    Log.w("PhotoDetailViewModel", "No memories found in community")
+                    return@launch
+                }
+
+                // Get the newest memory (should be first in the list)
                 val newestMemory = community.memories.first()
 
-                // Find the main user's photo slot to update with the current photo
+                // Find the main user's photo slot
                 val mainUserPhoto =
-                    newestMemory.photos.firstOrNull { it.userId == "user_main" } ?: return@launch
+                    newestMemory.photos.firstOrNull { it.userId == "user_main" } ?: run {
+                        Log.w("PhotoDetailViewModel", "Main user photo not found")
+                        return@launch
+                    }
 
                 // Update that slot with the current photo
                 updateMemoryPhotoUseCase(
@@ -143,18 +198,25 @@ class PhotoDetailViewModel(
                     newPhotoUrl = photoUri
                 )
 
+                _uiState.update {
+                    it.copy(
+                        isLoading = false, navigationEvent = NavigationEvent.NavigateBack
+                    )
+                }
             } catch (e: Exception) {
-                // Handle error
-                Log.e("PhotoDetailViewModel", "Error creating event", e)
+                handleError(e, "Error creating new event")
+                _uiState.update { it.copy(isLoading = false, showCommunitySelection = false) }
             }
         }
     }
 
-    fun updateAllMissingPhotos(currentPhotoUri: String) {
+    private fun updateAllMissingPhotos(currentPhotoUri: String) {
         viewModelScope.launch {
             try {
+                _uiState.update { it.copy(isLoading = true) }
+
                 // Get list of missing photos
-                val missingPhotos = _missingPhotoInfo.value
+                val missingPhotos = uiState.value.missingPhotoInfo
 
                 // Process each missing photo
                 missingPhotos.forEach { missingPhotoInfo ->
@@ -170,18 +232,40 @@ class PhotoDetailViewModel(
                 }
 
                 // Refresh the missing photo info list
-                // After updating all photos, the list should be empty
-                _missingPhotoInfo.value = getMissingPhotoInfoUseCase()
+                val updatedMissingInfo = getMissingPhotoInfoUseCase()
 
+                _uiState.update {
+                    it.copy(
+                        missingPhotoInfo = updatedMissingInfo,
+                        isLoading = false,
+                        navigationEvent = NavigationEvent.NavigateBack
+                    )
+                }
             } catch (e: Exception) {
-                Log.e("PhotoDetailViewModel", "Error updating all photos", e)
-                // Handle error - could show a toast or error message
+                handleError(e, "Error updating all missing photos")
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
+
+    private fun showCommunitySelector() {
+        _uiState.update { it.copy(showCommunitySelection = true) }
+    }
+
+    private fun dismissCommunitySelector() {
+        _uiState.update { it.copy(showCommunitySelection = false) }
+    }
+
+    private fun clearNavigationEvent() {
+        _uiState.update { it.copy(navigationEvent = null) }
+    }
+
+    private fun handleError(exception: Exception, message: String) {
+        Log.e("PhotoDetailViewModel", message, exception)
+        // You could also dispatch errors to a channel for showing in the UI
+    }
 }
 
-// In PhotoDetailViewModel.kt
 data class PhotoDetailUiState(
     val photo: Photo? = null,
     val isLoading: Boolean = false,
@@ -194,4 +278,18 @@ data class PhotoDetailUiState(
 sealed class NavigationEvent {
     object NavigateBack : NavigationEvent()
     object PhotoDeleted : NavigationEvent()
+}
+
+sealed class PhotoDetailEvent {
+    data class LoadPhoto(val photoId: Int) : PhotoDetailEvent()
+    data class DeletePhoto(val photoId: Int) : PhotoDetailEvent()
+    data class UpdateMissingPhoto(
+        val missingPhotoInfo: MissingPhotoInfo, val currentPhotoUri: String
+    ) : PhotoDetailEvent()
+
+    data class UpdateAllMissingPhotos(val currentPhotoUri: String) : PhotoDetailEvent()
+    data class CreateEvent(val communityId: String, val photoUri: String) : PhotoDetailEvent()
+    object ShowCommunitySelector : PhotoDetailEvent()
+    object DismissCommunitySelector : PhotoDetailEvent()
+    object NavigationHandled : PhotoDetailEvent()
 }

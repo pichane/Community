@@ -38,6 +38,7 @@ val appModule = module {
     factory { GetMissingPhotoInfoUseCase(get()) }
     factory { UpdateMemoryPhotoUseCase(get()) }
     factory { GetMemoryUseCase(get()) }
+
     // ViewModels
     viewModel { HomeViewModel(get(), get()) }
     viewModel { CameraViewModel(get()) }

@@ -1,6 +1,5 @@
 package com.example.myapp.presentation.camera
 
-
 import android.Manifest
 import android.content.Context
 import android.net.Uri
@@ -14,23 +13,9 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,11 +28,14 @@ import com.example.myapp.presentation.common.debouncedClickable
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.Executor
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+
+
+import kotlinx.coroutines.delay
+import kotlin.coroutines.resumeWithException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +86,8 @@ fun CameraScreen(
             TopAppBar(
                 title = { Text("Take Photo") },
                 navigationIcon = {
-                    Text("Back", modifier = Modifier.debouncedClickable { onBack() })
+                        Text("Back", modifier =
+                            Modifier.debouncedClickable { onBack() })
                 }
             )
         }
@@ -225,10 +214,7 @@ fun CameraPreview(
             }
         }
 
-        cameraProviderFuture.addListener(
-            cameraProviderListener,
-            ContextCompat.getMainExecutor(context)
-        )
+        cameraProviderFuture.addListener(cameraProviderListener, ContextCompat.getMainExecutor(context))
 
         onDispose {
             try {
