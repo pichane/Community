@@ -19,7 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.myapp.presentation.camera.CameraScreen
+import com.example.myapp.presentation.screen.camera.CameraScreen
 import com.example.myapp.presentation.screen.home.HomeScreen
 import com.example.myapp.presentation.screen.memory.PhotoCompositionScreen
 import com.example.myapp.presentation.screen.navigation.SharedElementTransition

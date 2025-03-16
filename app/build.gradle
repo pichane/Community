@@ -39,6 +39,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion "1.5.1"
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -79,8 +83,38 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
+    // Unit Testing
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:5.6.0'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:5.1.0'
+
+    // AndroidX Test
+    testImplementation 'androidx.arch.core:core-testing:2.2.0'
+
+    // Kotlin Coroutines Test
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+
+    // Flow Testing
+    testImplementation 'app.cash.turbine:turbine:1.0.0'
+
+    // Optional: MockK as an alternative to Mockito
+    testImplementation 'io.mockk:mockk:1.13.8'
+
+    // Testing Room
+    testImplementation 'androidx.room:room-testing:2.6.1'
+
+    // Android Instrumented Tests (if needed)
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.5.4'
+
+    testImplementation 'org.robolectric:robolectric:4.11.1'
+
+    // Add Mockito and testing dependencies
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:5.6.0'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:5.1.0'
+    testImplementation 'androidx.arch.core:core-testing:2.2.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+    implementation "org.jetbrains.kotlin:kotlin-test:2.0.21"
 }

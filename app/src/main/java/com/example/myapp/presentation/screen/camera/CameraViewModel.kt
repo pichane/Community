@@ -13,9 +13,12 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.camera.core.ImageCapture
+import com.example.myapp.domain.usecase.CapturePhotoUseCase
 
 class CameraViewModel(
-    private val savePhotoUseCase: SavePhotoUseCase
+    private val savePhotoUseCase: SavePhotoUseCase,
+    private val capturePhotoUseCase: CapturePhotoUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CameraUiState())
@@ -23,23 +26,21 @@ class CameraViewModel(
 
     fun onEvent(event: CameraEvent) {
         when (event) {
-            is CameraEvent.PhotoCaptured -> savePhoto(event.uri)
+            is CameraEvent.PhotoCaptured -> capturePhoto(event.imageCapture)
             is CameraEvent.SetCameraReady -> setCameraReady(event.isReady)
-            is CameraEvent.SetCapturing -> setCapturing(event.isCapturing)
-            is CameraEvent.ErrorOccurred -> handleError(event.message)
             CameraEvent.ErrorShown -> clearError()
         }
     }
 
-    private fun savePhoto(uri: Uri) {
+    fun capturePhoto(imageCapture: ImageCapture) {
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isCapturing = true) }
+                val uri = capturePhotoUseCase(imageCapture)
 
                 val timestamp = System.currentTimeMillis()
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                 val title = "Photo ${dateFormat.format(Date(timestamp))}"
-
                 val photo = Photo(
                     uri = uri,
                     timestamp = timestamp,
@@ -55,17 +56,13 @@ class CameraViewModel(
                     )
                 }
             } catch (e: Exception) {
-                handleError("Failed to save photo: ${e.message}")
+                handleError(e.message.toString())
             }
         }
     }
 
     private fun setCameraReady(isReady: Boolean) {
         _uiState.update { it.copy(isCameraReady = isReady) }
-    }
-
-    private fun setCapturing(isCapturing: Boolean) {
-        _uiState.update { it.copy(isCapturing = isCapturing) }
     }
 
     private fun handleError(message: String) {
@@ -92,9 +89,7 @@ data class CameraUiState(
 )
 
 sealed class CameraEvent {
-    data class PhotoCaptured(val uri: Uri) : CameraEvent()
+    data class PhotoCaptured(val imageCapture: ImageCapture) : CameraEvent()
     data class SetCameraReady(val isReady: Boolean) : CameraEvent()
-    data class SetCapturing(val isCapturing: Boolean) : CameraEvent()
-    data class ErrorOccurred(val message: String) : CameraEvent()
     object ErrorShown : CameraEvent()
 }
