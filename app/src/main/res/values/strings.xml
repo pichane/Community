@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Android Clean Architecture App</string>
+    <string name="welcome_message">Welcome to the Android Clean Architecture App!</string>
+    <string name="error_fetching_data">Error fetching data. Please try again.</string>
+    <string name="no_items_found">No items found.</string>
+</resources>
