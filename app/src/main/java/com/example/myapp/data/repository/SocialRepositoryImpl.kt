@@ -3,7 +3,6 @@ package com.example.myapp.data.repository
 import com.example.myapp.domain.model.Community
 import com.example.myapp.domain.model.FromUser
 import com.example.myapp.domain.model.Memory
-import com.example.myapp.domain.model.MissingPhotoInfo
 import com.example.myapp.domain.model.User
 import com.example.myapp.domain.repository.SocialRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,9 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 class SocialRepositoryImpl : SocialRepository {
-
-    // Add this property to store the selected missing photo
-    private var selectedMissingPhoto: MissingPhotoInfo? = null
 
     private val discoveryUsers = MutableStateFlow(
         listOf(

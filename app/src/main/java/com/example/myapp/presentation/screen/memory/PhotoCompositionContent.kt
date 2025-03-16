@@ -24,11 +24,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.myapp.R
 import com.example.myapp.domain.model.FromUser
 import com.example.myapp.domain.model.Memory
 import com.example.myapp.presentation.screen.home.HandlePhotoDisplay
+import com.example.myapp.presentation.theme.dimensions
 
 @Composable
 fun PhotoCompositionContent(
@@ -85,7 +88,7 @@ private fun SuccessState(
             name = title,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(16.dp)
+                .padding(MaterialTheme.dimensions.iconSmall)
         )
     }
 }
@@ -104,7 +107,7 @@ private fun CommunityNameOverlay(
                 color = Color.Black.copy(alpha = 0.5f),
                 shape = MaterialTheme.shapes.small
             )
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(horizontal = MaterialTheme.dimensions.iconSmall, vertical = MaterialTheme.dimensions.spaceExtraSmall)
     )
 }
 
@@ -115,17 +118,17 @@ private fun ErrorState(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier.padding(MaterialTheme.dimensions.iconSmall),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
             imageVector = Icons.Default.Warning,
             contentDescription = null,
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(MaterialTheme.dimensions.iconExtraLargePlus),
             tint = MaterialTheme.colorScheme.error
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconSmall))
 
         Text(
             text = message,
@@ -133,10 +136,10 @@ private fun ErrorState(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconSmall))
 
         Button(onClick = onRetry) {
-            Text("Retry")
+            Text(stringResource(R.string.retry))
         }
     }
 }
@@ -146,7 +149,7 @@ fun FullScreenPhotoComposition(
     photos: List<FromUser>,
     isHorizontal: Boolean,
     modifier: Modifier = Modifier,
-    mainUserId: String = "user_main"
+    mainUserId: String = stringResource(R.string.user_main)
 ) {
     Box(modifier = modifier) {
         if (isHorizontal) {

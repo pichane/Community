@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,14 +39,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
+import com.example.myapp.R
 import com.example.myapp.domain.model.Community
 import com.example.myapp.domain.model.User
+import com.example.myapp.presentation.theme.dimensions
 
 @Composable
 fun SocialContent(
@@ -58,8 +62,8 @@ fun SocialContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        contentPadding = PaddingValues(MaterialTheme.dimensions.iconSmall),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.dimensions.iconMedium)
     ) {
         // Your Communities section
         if (uiState.userCommunities.isNotEmpty()) {
@@ -98,12 +102,12 @@ private fun CommunitiesSection(
     onCommunityClick: (Community) -> Unit
 ) {
     Column {
-        SectionTitle("Your Communities")
-        Spacer(modifier = Modifier.height(8.dp))
+        SectionTitle(stringResource(R.string.your_communities))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.spaceSmall))
 
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(end = 8.dp)
+            contentPadding = PaddingValues(end = MaterialTheme.dimensions.spaceSmall)
         ) {
             items(communities) { community ->
                 CommunityCard(
@@ -120,12 +124,12 @@ private fun FriendsSection(
     friends: List<User>
 ) {
     Column {
-        SectionTitle("Friends")
-        Spacer(modifier = Modifier.height(8.dp))
+        SectionTitle(stringResource(R.string.friends))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.spaceSmall))
 
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(end = 8.dp)
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimensions.iconSmall),
+            contentPadding = PaddingValues(end = MaterialTheme.dimensions.spaceSmall)
         ) {
             items(friends) { friend ->
                 FriendItem(friend = friend)
@@ -142,8 +146,8 @@ private fun DiscoverySection(
     onJoinCommunity: (String) -> Unit
 ) {
     Column {
-        SectionTitle("Discovery")
-        Spacer(modifier = Modifier.height(16.dp))
+        SectionTitle(stringResource(R.string.discovery))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconSmall))
 
         // Show empty state if no discovery items
         if (communities.isEmpty() && users.isEmpty()) {
@@ -161,7 +165,7 @@ private fun DiscoverySection(
 
         // Users to discover
         if (users.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconSmall))
             DiscoveryUsersSection(
                 users = users,
                 onAddFriend = onAddFriend
@@ -177,17 +181,17 @@ private fun DiscoveryCommunitiesSection(
 ) {
     Column {
         Text(
-            text = "Communities you might like",
+            text = stringResource(R.string.communities_you_might_like),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = MaterialTheme.dimensions.spaceSmall)
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.dimensions.spaceSmall)) {
             communities.take(3).forEach { community ->
                 CommunityRow(
                     name = community.userName,
                     profilePicture = community.profilePictureUrl,
-                    buttonText = "Join",
+                    buttonText = stringResource(R.string.join),
                     onButtonClick = { onJoinCommunity(community.id) }
                 )
             }
@@ -202,17 +206,17 @@ private fun DiscoveryUsersSection(
 ) {
     Column {
         Text(
-            text = "Invitation",
+            text = stringResource(R.string.invitation),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = MaterialTheme.dimensions.spaceSmall)
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.dimensions.spaceSmall)) {
             users.take(5).forEach { user ->
                 UserRow(
                     name = user.userName,
                     profilePicture = user.profilePictureUrl,
-                    buttonText = "Accept",
+                    buttonText = stringResource(R.string.accept),
                     onButtonClick = { onAddFriend(user.id) }
                 )
             }
@@ -236,7 +240,7 @@ fun UserRow(
     buttonText: String,
     onButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(8.dp),
+    shape: Shape = RoundedCornerShape(MaterialTheme.dimensions.spaceSmall),
     cardColors: CardColors = CardDefaults.cardColors()
 ) {
     Card(
@@ -254,10 +258,10 @@ fun UserRow(
             UserAvatar(
                 profilePicture = profilePicture,
                 userName = name,
-                size = 48.dp
+                size = MaterialTheme.dimensions.iconExtraLargePlus
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(MaterialTheme.dimensions.iconSmall))
 
             // Name
             Text(
@@ -268,7 +272,7 @@ fun UserRow(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(MaterialTheme.dimensions.spaceSmall))
 
             // Action button
             Button(onClick = onButtonClick) {
@@ -288,7 +292,7 @@ fun UserAvatar(
     Box(modifier = modifier.size(size)) {
         SubcomposeAsyncImage(
             model = profilePicture,
-            contentDescription = "Profile picture of $userName",
+            contentDescription = stringResource(R.string.profile_picture_of, userName),
             modifier = Modifier
                 .size(size)
                 .clip(CircleShape),
@@ -341,7 +345,7 @@ fun CommunityRow(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(MaterialTheme.dimensions.spaceSmall)
     ) {
         Row(
             modifier = Modifier
@@ -352,33 +356,38 @@ fun CommunityRow(
             // Community profile picture
             AsyncImage(
                 model = profilePicture,
-                contentDescription = "Community picture of $name",
+                contentDescription = stringResource(R.string.community_picture_of, name),
                 modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .size(MaterialTheme.dimensions.avatarSize)
+                    .clip(RoundedCornerShape(MaterialTheme.dimensions.spaceSmall)),
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(MaterialTheme.dimensions.iconSmall))
 
             // Community info
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+            CommunityInfo(name)
 
-                Text(
-                    text = "members",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            // Action button
             JoinButton(text = buttonText, onClick = onButtonClick)
         }
+    }
+}
+
+@Composable
+private fun RowScope.CommunityInfo(name: String) {
+    Column(modifier = Modifier.weight(1f)) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Text(
+            text = stringResource(R.string.members),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -388,9 +397,9 @@ fun JoinButton(text: String, onClick: () -> Unit) {
         Icon(
             Icons.Default.Add,
             contentDescription = null,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(MaterialTheme.dimensions.iconSmallPlus)
         )
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(MaterialTheme.dimensions.spaceExtraSmall))
         Text(text)
     }
 }
@@ -405,7 +414,7 @@ fun CommunityCard(
         modifier = modifier
             .width(160.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(MaterialTheme.dimensions.iconSmall)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -418,7 +427,10 @@ fun CommunityCard(
             ) {
                 AsyncImage(
                     model = community.profilePictureUrl,
-                    contentDescription = "Community image for ${community.userName}",
+                    contentDescription = stringResource(
+                        R.string.community_image_for,
+                        community.userName
+                    ),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -438,7 +450,7 @@ fun CommunityCard(
                 )
 
                 Text(
-                    text = "members",
+                    text = stringResource(R.string.members),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1
@@ -461,10 +473,10 @@ fun FriendItem(
         UserAvatar(
             profilePicture = friend.profilePictureUrl,
             userName = friend.userName,
-            size = 64.dp
+            size = MaterialTheme.dimensions.iconVeryLarge
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.spaceExtraSmall))
 
         // Friend name
         Text(
@@ -482,30 +494,30 @@ fun EmptyDiscoveryState() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 32.dp),
+            .padding(vertical = MaterialTheme.dimensions.iconLarge),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
             imageVector = Icons.Default.Warning,
             contentDescription = null,
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(MaterialTheme.dimensions.iconExtraLargePlus),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconSmall))
 
         Text(
-            text = "No suggestions available",
+            text = stringResource(R.string.no_suggestions_available),
             style = MaterialTheme.typography.titleMedium
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.spaceSmall))
 
         Text(
             text = "We'll notify you when we find communities or people you might like",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp),
+            modifier = Modifier.padding(horizontal = MaterialTheme.dimensions.iconLarge),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

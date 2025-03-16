@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,40 +15,43 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.example.myapp.R
 import com.example.myapp.domain.model.Community
 import com.example.myapp.domain.model.MissingPhotoInfo
 import com.example.myapp.domain.model.Photo
 import com.example.myapp.presentation.common.debouncedClickable
+import com.example.myapp.presentation.theme.dimensions
 import kotlin.math.min
 
 @Composable
@@ -64,9 +68,10 @@ fun PhotoDetailContent(
     onCommunitySelected: (communityId: String) -> Unit,
     onDismissCommunitySelection: () -> Unit
 ) {
+    var hasMissingInfo: Boolean by remember { mutableStateOf(missingPhotoInfo.isNotEmpty()) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Photo display section (takes up most of the screen)
             PhotoDisplaySection(
                 photoUri = photo.uri.toString(),
                 onBackClick = onBackClick,
@@ -76,10 +81,9 @@ fun PhotoDetailContent(
                     .fillMaxWidth()
             )
 
-            // Bottom action section
             BottomActionSection(
                 missingPhotoInfo = missingPhotoInfo,
-                showMissingPhotoSection = missingPhotoInfo.isNotEmpty(),
+                showMissingPhotoSection = hasMissingInfo,
                 onMissingPhotoClick = onMissingPhotoClick,
                 onAddToAllClick = onAddToAllClick,
                 onCreateEventClick = onCreateEventClick,
@@ -89,7 +93,6 @@ fun PhotoDetailContent(
             )
         }
 
-        // Community selection bottom sheet
         if (showCommunitySelection) {
             CommunitySelectionSheet(
                 communities = userCommunities,
@@ -108,83 +111,72 @@ fun PhotoDisplaySection(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        // Photo image
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = photoUri,
-                onLoading = { Log.d("PhotoDetail", "Loading image: $photoUri") },
-                onError = {
-                    Log.e(
-                        "PhotoDetail",
-                        "Error loading image: $photoUri",
-                        it.result.throwable
-                    )
-                }
-            ),
-            contentDescription = "Photo Detail",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
+        PhotoImage(photoUri)
 
         // Action buttons overlay
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(28.dp)
+                .padding(MaterialTheme.dimensions.iconMediumPlus)
         ) {
-            // Back button (top left)
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .size(42.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
-                        shape = CircleShape
-                    )
-                    .padding(10.dp)
-                    .debouncedClickable { onBackClick() }
-            )
-
-            // Delete button (top right)
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete",
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(42.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
-                        shape = CircleShape
-                    )
-                    .padding(10.dp)
-                    .debouncedClickable { onDeleteClick() }
-            )
+            BackButton(onBackClick)
+            DeleteButton(onDeleteClick)
         }
     }
 }
 
 @Composable
-fun ActionIconButton(
-    icon: ImageVector,
-    contentDescription: String,
-    onClick: () -> Unit
-) {
-    IconButton(
-        onClick = onClick,
+private fun PhotoImage(photoUri: String) {
+    Image(
+        painter = rememberAsyncImagePainter(
+            model = photoUri,
+            onLoading = { Log.d("PhotoDetail", "Loading image: $photoUri") },
+            onError = {
+                Log.e(
+                    "PhotoDetail",
+                    "Error loading image: $photoUri",
+                    it.result.throwable
+                )
+            }
+        ),
+        contentDescription = stringResource(R.string.photo_detail),
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+@Composable
+private fun BoxScope.BackButton(onBackClick: () -> Unit) {
+    Icon(
+        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+        contentDescription = stringResource(R.string.back),
         modifier = Modifier
-            .size(40.dp)
+            .align(Alignment.TopStart)
+            .size(42.dp)
             .background(
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
                 shape = CircleShape
             )
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription
-        )
-    }
+            .padding(10.dp)
+            .debouncedClickable { onBackClick() }
+    )
+}
+
+@Composable
+private fun BoxScope.DeleteButton(onDeleteClick: () -> Unit) {
+    Icon(
+        imageVector = Icons.Default.Delete,
+        contentDescription = stringResource(R.string.delete),
+        modifier = Modifier
+            .align(Alignment.TopEnd)
+            .size(42.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                shape = CircleShape
+            )
+            .padding(10.dp)
+            .debouncedClickable { onDeleteClick() }
+    )
 }
 
 @Composable
@@ -200,47 +192,59 @@ fun BottomActionSection(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surface
     ) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = MaterialTheme.dimensions.iconSmall, vertical = MaterialTheme.dimensions.spaceSmall)) {
             if (showMissingPhotoSection) {
-                // Missing photos section
-                Text(
-                    text = "Use This Photo For",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                MissingPhotoRow(
-                    missingPhotos = missingPhotoInfo,
-                    onTakePhotoClick = onMissingPhotoClick,
-                    onAddToAllClick = onAddToAllClick
-                )
+                MissingPhotosSection(missingPhotoInfo, onMissingPhotoClick, onAddToAllClick)
             } else {
-                // Create Event Button
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Create New Event",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    Button(
-                        onClick = onCreateEventClick,
-                        modifier = Modifier.fillMaxWidth(0.8f)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text("Create Community Event")
-                    }
-                }
+                CreateEventButton(onCreateEventClick)
             }
         }
     }
+}
+
+@Composable
+private fun CreateEventButton(onCreateEventClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(R.string.create_new_event),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = MaterialTheme.dimensions.spaceSmall)
+        )
+
+        Button(
+            onClick = onCreateEventClick,
+            modifier = Modifier.fillMaxWidth(0.8f)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.padding(end = MaterialTheme.dimensions.spaceSmall)
+            )
+            Text(stringResource(R.string.create_community_event))
+        }
+    }
+}
+
+@Composable
+private fun MissingPhotosSection(
+    missingPhotoInfo: List<MissingPhotoInfo>,
+    onMissingPhotoClick: (MissingPhotoInfo) -> Unit,
+    onAddToAllClick: () -> Unit
+) {
+    Text(
+        text = stringResource(R.string.use_this_photo_for),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(bottom = MaterialTheme.dimensions.spaceSmall)
+    )
+
+    MissingPhotoRow(
+        missingPhotos = missingPhotoInfo,
+        onTakePhotoClick = onMissingPhotoClick,
+        onAddToAllClick = onAddToAllClick
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -270,18 +274,18 @@ private fun CommunitySelectionContent(
     communities: List<Community>,
     onCommunitySelected: (Community) -> Unit
 ) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(modifier = Modifier.padding(horizontal = MaterialTheme.dimensions.iconSmall, vertical = MaterialTheme.dimensions.spaceSmall)) {
         Text(
-            text = "Select Community",
+            text = stringResource(R.string.select_community),
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(bottom = 16.dp, top = 8.dp)
+            modifier = Modifier.padding(bottom = MaterialTheme.dimensions.iconSmall, top = MaterialTheme.dimensions.spaceSmall)
         )
 
         if (communities.isEmpty()) {
             Text(
-                text = "No communities found",
+                text = stringResource(R.string.no_communities_found),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 16.dp)
+                modifier = Modifier.padding(vertical = MaterialTheme.dimensions.iconSmall)
             )
         } else {
             communities.forEach { community ->
@@ -291,8 +295,7 @@ private fun CommunitySelectionContent(
                 )
             }
 
-            // Add some padding at the bottom for better UX
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconLarge))
         }
     }
 }
@@ -305,28 +308,26 @@ private fun CommunityItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = MaterialTheme.dimensions.spaceExtraSmall)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(MaterialTheme.dimensions.iconSmall),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimensions.iconSmall)
         ) {
-            // Community profile picture
             AsyncImage(
                 model = community.profilePictureUrl,
-                contentDescription = "Community profile",
+                contentDescription = stringResource(R.string.community_profile),
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(MaterialTheme.dimensions.iconExtraLargePlus)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
 
-            // Community name
             Text(
                 text = community.userName,
                 style = MaterialTheme.typography.titleMedium,
@@ -335,7 +336,7 @@ private fun CommunityItem(
 
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Create event",
+                contentDescription = stringResource(R.string.create_event),
                 tint = MaterialTheme.colorScheme.primary
             )
         }
@@ -350,7 +351,7 @@ fun MissingPhotoRow(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimensions.spaceSmall)
     ) {
         // Show max 3 items
         for (i in 0 until min(2, missingPhotos.size)) {
@@ -368,7 +369,7 @@ fun MissingPhotoRow(
 
         // Add to all button always takes one slot
         MissingPhotoItem(
-            name = "Add to all communities",
+            name = stringResource(R.string.add_to_all_communities),
             modifier = Modifier.weight(1f),
             onClick = onAddToAllClick,
             color = MaterialTheme.colorScheme.primaryContainer
@@ -394,17 +395,17 @@ fun MissingPhotoItem(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(MaterialTheme.dimensions.spaceSmall),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Add Photo",
-                modifier = Modifier.size(24.dp)
+                contentDescription = stringResource(R.string.add_photo),
+                modifier = Modifier.size(MaterialTheme.dimensions.iconMedium)
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.dimensions.spaceExtraSmall))
 
             Text(
                 text = name,

@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.myapp.R
+import com.example.myapp.presentation.theme.dimensions
 
 /**
  * only for the Demo... no point to review this file
@@ -23,33 +25,33 @@ fun OnBoardingScreen(onGetStartedClick: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
+            .padding(MaterialTheme.dimensions.iconSmall),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_app_icon),
-            contentDescription = "App Logo",
+            contentDescription = stringResource(R.string.app_logo),
             modifier = Modifier.size(200.dp)
         )
         
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconLarge))
         
         Text(
-            text = "Welcome to My App",
+            text = stringResource(R.string.welcome_to_my_app),
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconSmall))
         
         Text(
-            text = "This app demonstrates Clean Architecture with Jetpack Compose",
+            text = stringResource(R.string.this_app_demonstrates_clean_architecture_with_jetpack_compose),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
         
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.dimensions.iconLarge))
         
         Button(
             onClick = onGetStartedClick,
@@ -57,7 +59,7 @@ fun OnBoardingScreen(onGetStartedClick: () -> Unit) {
                 .fillMaxWidth()
                 .height(50.dp)
         ) {
-            Text(text = "Get Started")
+            Text(text = stringResource(R.string.get_started))
         }
     }
 }

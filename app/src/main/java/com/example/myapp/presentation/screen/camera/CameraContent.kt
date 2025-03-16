@@ -1,14 +1,8 @@
 package com.example.myapp.presentation.screen.camera
 
-import android.Manifest
-import android.content.Context
-import android.net.Uri
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -22,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,29 +24,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.example.myapp.R
 import com.example.myapp.presentation.common.debouncedClickable
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.concurrent.Executor
+import com.example.myapp.presentation.theme.dimensions
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,9 +99,10 @@ fun CameraContent(
 @Composable
 private fun CameraTopBar(onBack: () -> Unit) {
     TopAppBar(
-        title = { Text("Take Photo") },
+        title = { Text(stringResource(R.string.take_photo)) },
         navigationIcon = {
-            Text("Back",
+            Text(
+                stringResource(R.string.back),
                 modifier = Modifier.debouncedClickable {
                     onBack()
                 }
@@ -140,9 +128,9 @@ private fun PermissionRequiredMessage() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Camera permission is required to use this feature",
+            text = stringResource(R.string.camera_permission_body),
             modifier = Modifier
-                .padding(16.dp)
+                .padding(MaterialTheme.dimensions.iconSmall)
         )
     }
 }
@@ -163,7 +151,7 @@ private fun CameraControls(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 32.dp),
+            .padding(bottom = MaterialTheme.dimensions.iconLarge),
         contentAlignment = Alignment.BottomCenter
     ) {
         FloatingActionButton(
@@ -178,7 +166,7 @@ private fun CameraControls(
             ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Take Photo"
+                contentDescription = stringResource(R.string.take_photo)
             )
         }
     }
