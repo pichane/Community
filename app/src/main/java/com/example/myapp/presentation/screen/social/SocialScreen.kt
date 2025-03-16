@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.social
+package com.example.myapp.presentation.screen.social
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box

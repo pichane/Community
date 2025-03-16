@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.memory
+package com.example.myapp.presentation.screen.memory
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize

@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.photodetail
+package com.example.myapp.presentation.screen.photodetail
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.memory
+package com.example.myapp.presentation.screen.memory
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

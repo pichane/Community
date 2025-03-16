@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.home
+package com.example.myapp.presentation.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

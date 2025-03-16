@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.home
+package com.example.myapp.presentation.screen.home
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -72,7 +72,7 @@ fun HomeScreen(
                         contentAlignment = Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            painter = painterResource(id = R.drawable.ic_app_icon),
                             contentDescription = "App Logo",
                             modifier = Modifier
                                 .size(40.dp)
@@ -391,7 +391,6 @@ fun PhotoComposition(
                     if (index < 2) { // Don't add divider after last item
                         HorizontalDivider(
                             thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -413,7 +412,7 @@ fun PhotoComposition(
                         }
                     }
 
-                    Divider(
+                    VerticalDivider(
                         modifier = Modifier
                             .width(1.dp)
                             .fillMaxHeight()
@@ -433,7 +432,9 @@ fun PhotoComposition(
                     }
                 }
 
-                Divider()
+                HorizontalDivider(
+                    thickness = 1.dp,
+                )
 
                 Row(modifier = Modifier.weight(1f)) {
                     // Bottom left photo
@@ -448,7 +449,7 @@ fun PhotoComposition(
                             EmptyPhotoPlaceholder()
                         }
                     }
-                    Divider(
+                    VerticalDivider(
                         modifier = Modifier
                             .width(1.dp)
                             .fillMaxHeight()

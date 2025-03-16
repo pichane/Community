@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.social
+package com.example.myapp.presentation.screen.social
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

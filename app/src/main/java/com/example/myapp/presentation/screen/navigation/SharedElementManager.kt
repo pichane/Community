@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.navigation
+package com.example.myapp.presentation.screen.navigation
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState

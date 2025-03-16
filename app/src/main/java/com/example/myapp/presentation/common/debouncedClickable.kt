@@ -8,7 +8,7 @@ import androidx.compose.ui.composed
 
 
 fun Modifier.debouncedClickable(
-    debounceTime: Long = 300L,
+    debounceTime: Long = 400L,
     onClick: () -> Unit
 ): Modifier = composed {
     val lastClickTime = remember { java.util.concurrent.atomic.AtomicLong(0) }

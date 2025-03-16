@@ -2,16 +2,14 @@ package com.example.myapp.presentation
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,12 +20,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myapp.presentation.camera.CameraScreen
-import com.example.myapp.presentation.home.HomeScreen
-import com.example.myapp.presentation.memory.PhotoCompositionScreen
-import com.example.myapp.presentation.navigation.SharedElementTransition
-import com.example.myapp.presentation.onboarding.OnBoardingScreen
-import com.example.myapp.presentation.photodetail.PhotoDetailScreen
-import com.example.myapp.presentation.social.SocialScreen
+import com.example.myapp.presentation.screen.home.HomeScreen
+import com.example.myapp.presentation.screen.memory.PhotoCompositionScreen
+import com.example.myapp.presentation.screen.navigation.SharedElementTransition
+import com.example.myapp.presentation.screen.onboarding.OnBoardingScreen
+import com.example.myapp.presentation.screen.photodetail.PhotoDetailScreen
+import com.example.myapp.presentation.screen.social.SocialScreen
 import com.example.myapp.presentation.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
@@ -104,6 +102,8 @@ fun AppNavigation() {
                     navController.popBackStack()
                 },
                 onBack = {
+
+                    Log.e("yallah", " clicked MainActivity")
                     navController.popBackStack()
                 }
             )

@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.onboarding
+package com.example.myapp.presentation.screen.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,7 +28,7 @@ fun OnBoardingScreen(onGetStartedClick: () -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            painter = painterResource(id = R.drawable.ic_app_icon),
             contentDescription = "App Logo",
             modifier = Modifier.size(200.dp)
         )

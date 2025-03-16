@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.photodetail
+package com.example.myapp.presentation.screen.photodetail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

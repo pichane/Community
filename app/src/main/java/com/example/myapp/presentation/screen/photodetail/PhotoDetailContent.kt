@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.photodetail
+package com.example.myapp.presentation.screen.photodetail
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,6 +47,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.myapp.domain.model.Community
 import com.example.myapp.domain.model.MissingPhotoInfo
 import com.example.myapp.domain.model.Photo
+import com.example.myapp.presentation.common.debouncedClickable
 import kotlin.math.min
 
 @Composable
@@ -123,26 +126,40 @@ fun PhotoDisplaySection(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Action buttons as floating buttons
-        Row(
+        // Action buttons overlay
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+                .fillMaxSize()
+                .padding(28.dp)
         ) {
-            // Back button
-            ActionIconButton(
-                icon = Icons.Default.ArrowBack,
+            // Back button (top left)
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                onClick = onBackClick
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .size(42.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                        shape = CircleShape
+                    )
+                    .padding(10.dp)
+                    .debouncedClickable { onBackClick() }
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Delete button
-            ActionIconButton(
-                icon = Icons.Default.Delete,
+            // Delete button (top right)
+            Icon(
+                imageVector = Icons.Default.Delete,
                 contentDescription = "Delete",
-                onClick = onDeleteClick
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(42.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                        shape = CircleShape
+                    )
+                    .padding(10.dp)
+                    .debouncedClickable { onDeleteClick() }
             )
         }
     }
@@ -150,7 +167,7 @@ fun PhotoDisplaySection(
 
 @Composable
 fun ActionIconButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     contentDescription: String,
     onClick: () -> Unit
 ) {

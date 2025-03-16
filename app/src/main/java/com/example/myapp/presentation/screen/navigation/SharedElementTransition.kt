@@ -1,4 +1,4 @@
-package com.example.myapp.presentation.navigation
+package com.example.myapp.presentation.screen.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition

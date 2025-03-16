@@ -14,11 +14,11 @@ import com.example.myapp.domain.usecase.GetPhotoByIdUseCase
 import com.example.myapp.domain.usecase.GetUserCommunitiesUseCase
 import com.example.myapp.domain.usecase.SavePhotoUseCase
 import com.example.myapp.domain.usecase.UpdateMemoryPhotoUseCase
-import com.example.myapp.presentation.camera.CameraViewModel
-import com.example.myapp.presentation.home.HomeViewModel
-import com.example.myapp.presentation.memory.PhotoCompositionViewModel
-import com.example.myapp.presentation.photodetail.PhotoDetailViewModel
-import com.example.myapp.presentation.social.SocialViewModel
+import com.example.myapp.presentation.screen.camera.CameraViewModel
+import com.example.myapp.presentation.screen.home.HomeViewModel
+import com.example.myapp.presentation.screen.memory.PhotoCompositionViewModel
+import com.example.myapp.presentation.screen.photodetail.PhotoDetailViewModel
+import com.example.myapp.presentation.screen.social.SocialViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import com.example.myapp.domain.usecase.*
