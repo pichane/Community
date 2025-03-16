@@ -14,6 +14,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.myapp.R
 
+/**
+ * only for the Demo... no point to review this file
+ */
 @Composable
 fun OnBoardingScreen(onGetStartedClick: () -> Unit) {
     Column(
