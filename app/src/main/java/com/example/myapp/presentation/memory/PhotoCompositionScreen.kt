@@ -1,14 +1,32 @@
 package com.example.myapp.presentation.memory
 
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,7 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.myapp.domain.model.FromUser
-import com.example.myapp.domain.model.Memory
 import com.example.myapp.presentation.home.HandlePhotoDisplay
 import org.koin.androidx.compose.koinViewModel
 
@@ -87,6 +104,7 @@ fun PhotoCompositionScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+
                 is MemoryUiState.Success -> {
                     // Community name at the top
                     Text(
@@ -110,6 +128,7 @@ fun PhotoCompositionScreen(
                         modifier = Modifier.fillMaxSize()
                     )
                 }
+
                 is MemoryUiState.Error -> {
                     Column(
                         modifier = Modifier
@@ -157,10 +176,10 @@ fun FullScreenPhotoComposition(
                             .fillMaxWidth()
                     ) {
                         HandlePhotoDisplay(photo = fromUser, mainUserId = mainUserId)
-                        
+
                         if (index < photos.size - 1) {
                             HorizontalDivider(
-                                thickness = 1.dp, 
+                                thickness = 1.dp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.align(Alignment.BottomCenter)
                             )
@@ -173,9 +192,10 @@ fun FullScreenPhotoComposition(
             Column(modifier = Modifier.fillMaxSize()) {
                 Row(modifier = Modifier.weight(1f)) {
                     // Top left photo
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     ) {
                         if (photos.isNotEmpty()) {
                             HandlePhotoDisplay(photos[0], mainUserId)
@@ -189,9 +209,10 @@ fun FullScreenPhotoComposition(
                     )
 
                     // Top right photo
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     ) {
                         if (photos.size > 1) {
                             HandlePhotoDisplay(photos[1], mainUserId)
@@ -203,15 +224,16 @@ fun FullScreenPhotoComposition(
 
                 Row(modifier = Modifier.weight(1f)) {
                     // Bottom left photo
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     ) {
                         if (photos.size > 2) {
                             HandlePhotoDisplay(photos[2], mainUserId)
                         }
                     }
-                        
+
                     Divider(
                         modifier = Modifier
                             .width(1.dp)
@@ -220,9 +242,10 @@ fun FullScreenPhotoComposition(
 
                     if (photos.size > 3) {
                         // Bottom right photo
-                        Box(modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
                         ) {
                             if (photos.size > 3) {
                                 HandlePhotoDisplay(photos[3], mainUserId)

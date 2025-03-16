@@ -7,17 +7,8 @@ import kotlinx.coroutines.flow.first
 import java.util.Date
 import java.util.UUID
 
-/**
- * Use case responsible for creating and adding a new memory to a community
- */
+
 class AddMemoryToCommunityUseCase(private val socialRepository: SocialRepository) {
-    /**
-     * Creates a new memory for a community with empty photo slots for all members
-     *
-     * @param communityId ID of the community to add memory to
-     * @param title Title of the new memory
-     * @param date Date of the memory event
-     */
     suspend operator fun invoke(communityId: String, title: String, date: Date) {
         // Get community to find users
         val community = socialRepository.getUserCommunities()
@@ -40,10 +31,7 @@ class AddMemoryToCommunityUseCase(private val socialRepository: SocialRepository
         // Add the new memory to the community
         socialRepository.addMemoryToCommunity(communityId, newMemory)
     }
-    
-    /**
-     * Extract unique user IDs from a community's memories
-     */
+
     private fun extractUniqueUserIds(community: com.example.myapp.domain.model.Community): Set<String> {
         val userIds = mutableSetOf<String>()
         
@@ -59,10 +47,7 @@ class AddMemoryToCommunityUseCase(private val socialRepository: SocialRepository
         
         return userIds
     }
-    
-    /**
-     * Create empty photo slots for each user
-     */
+
     private fun createEmptyPhotos(userIds: Set<String>): List<FromUser> {
         return userIds.map { userId ->
             FromUser(
@@ -72,10 +57,7 @@ class AddMemoryToCommunityUseCase(private val socialRepository: SocialRepository
             )
         }
     }
-    
-    /**
-     * Build a new memory object
-     */
+
     private fun buildMemory(
         communityId: String,
         title: String,

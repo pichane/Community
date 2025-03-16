@@ -12,12 +12,7 @@ interface SocialRepository {
     fun getDiscoveryCommunities(): Flow<List<Community>>  // Communities to discover
     fun getFriends(): Flow<List<User>>
     suspend fun addFriend(userId: String)
-    suspend fun removeFriend(userId: String)
     suspend fun joinCommunity(communityId: String)  // Add new function
-    suspend fun leaveCommunity(communityId: String)  // Add new function// Add this method to your SocialRepository interface
-    suspend fun selectMissingPhotoForCapture(missingPhotoInfo: MissingPhotoInfo)
-    suspend fun getSelectedMissingPhoto(): MissingPhotoInfo?
-    suspend fun clearPhotoSelection()
     suspend fun updateMemoryPhoto(communityId: String, memoryId: String, photoId: String, newPhotoUrl: String)
 
     suspend fun addMemoryToCommunity(communityId: String, memory: Memory)

@@ -32,21 +32,10 @@ class SocialViewModel(
         }
     }
 
-    fun removeFriend(userId: String) {
-        viewModelScope.launch {
-            socialRepository.removeFriend(userId)
-        }
-    }
-
     fun joinCommunity(communityId: String) {
         viewModelScope.launch {
             socialRepository.joinCommunity(communityId)
         }
     }
 
-    fun leaveCommunity(communityId: String) {
-        viewModelScope.launch {
-            socialRepository.leaveCommunity(communityId)
-        }
-    }
 }

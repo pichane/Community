@@ -10,9 +10,7 @@ import com.example.myapp.domain.usecase.AddMemoryToCommunityUseCase
 import com.example.myapp.domain.usecase.DeletePhotoUseCase
 import com.example.myapp.domain.usecase.GetMissingPhotoInfoUseCase
 import com.example.myapp.domain.usecase.GetPhotoByIdUseCase
-import com.example.myapp.domain.usecase.GetSelectedMissingPhotoUseCase
 import com.example.myapp.domain.usecase.GetUserCommunitiesUseCase
-import com.example.myapp.domain.usecase.SelectMissingPhotoUseCase
 import com.example.myapp.domain.usecase.UpdateMemoryPhotoUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,8 +27,6 @@ class PhotoDetailViewModel(
     private val deletePhotoUseCase: DeletePhotoUseCase,
     private val getMissingPhotoInfoUseCase: GetMissingPhotoInfoUseCase,
     private val updateMemoryPhotoUseCase: UpdateMemoryPhotoUseCase,
-    private val selectMissingPhotoUseCase: SelectMissingPhotoUseCase,
-    private val getSelectedMissingPhotoUseCase: GetSelectedMissingPhotoUseCase,
     private val getUserCommunitiesUseCase: GetUserCommunitiesUseCase,
     private val addMemoryToCommunityUseCase: AddMemoryToCommunityUseCase
 ) : ViewModel() {
@@ -74,7 +70,7 @@ class PhotoDetailViewModel(
             }
         }
     }
-    
+
     fun deletePhoto(photoId: Int) {
         viewModelScope.launch {
             try {
@@ -86,38 +82,10 @@ class PhotoDetailViewModel(
         }
     }
 
-    fun selectMissingPhotoForCapture(missingPhotoInfo: MissingPhotoInfo) {
-        viewModelScope.launch {
-            selectMissingPhotoUseCase(missingPhotoInfo)
-        }
-    }
-
-    fun updateMissingPhoto(photoUri: String) {
-        viewModelScope.launch {
-            try {
-                // Get the previously selected missing photo
-                val missingPhotoInfo = getSelectedMissingPhotoUseCase() ?: return@launch
-
-                // Only proceed if we have a valid photo reference
-                val photoId = missingPhotoInfo.photo?.id ?: return@launch
-
-                // Update the memory photo
-                updateMemoryPhotoUseCase(
-                    communityId = missingPhotoInfo.communityId,
-                    memoryId = missingPhotoInfo.memoryId,
-                    photoId = photoId,
-                    newPhotoUrl = photoUri
-                )
-
-                // Refresh the missing photo info list
-                _missingPhotoInfo.value = getMissingPhotoInfoUseCase()
-            } catch (e: Exception) {
-                // Handle error
-            }
-        }
-    }
-
-    fun updateMissingPhotoWithCurrentPhoto(missingPhotoInfo: MissingPhotoInfo, currentPhotoUri: String) {
+    fun updateMissingPhotoWithCurrentPhoto(
+        missingPhotoInfo: MissingPhotoInfo,
+        currentPhotoUri: String
+    ) {
         viewModelScope.launch {
             try {
                 // Only proceed if we have a valid photo reference
@@ -160,7 +128,8 @@ class PhotoDetailViewModel(
                 val newestMemory = community.memories.first()
 
                 // Find the main user's photo slot to update with the current photo
-                val mainUserPhoto = newestMemory.photos.firstOrNull { it.userId == "user_main" } ?: return@launch
+                val mainUserPhoto =
+                    newestMemory.photos.firstOrNull { it.userId == "user_main" } ?: return@launch
 
                 // Update that slot with the current photo
                 updateMemoryPhotoUseCase(

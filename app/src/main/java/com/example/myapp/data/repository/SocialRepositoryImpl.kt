@@ -41,7 +41,7 @@ class SocialRepositoryImpl : SocialRepository {
                         photos = listOf(
                             FromUser(
                                 id = "photo1",
-                                userId = "friend3", // Main user's photo
+                                userId = "friend3",
                                 url = "https://picsum.photos/seed/photo1/900/900"
                             ),
                             FromUser(
@@ -51,12 +51,12 @@ class SocialRepositoryImpl : SocialRepository {
                             ),
                             FromUser(
                                 id = "photo3",
-                                userId = "user_main", // Main user's photo but empty
+                                userId = "user_main",
                                 url = ""
                             ),
                             FromUser(
                                 id = "photo4",
-                                userId = "friend2", // Friend's photo but empty
+                                userId = "friend2",
                                 url = ""
                             )
                         )
@@ -121,7 +121,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     ),
@@ -182,7 +182,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     ),
@@ -210,7 +210,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     )
@@ -243,7 +243,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     ),
@@ -271,7 +271,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     )
@@ -304,7 +304,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     ),
@@ -332,7 +332,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     )
@@ -365,7 +365,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     ),
@@ -393,7 +393,7 @@ class SocialRepositoryImpl : SocialRepository {
                             FromUser(
                                 id = "photo11",
                                 userId = "friend2",
-                                url = ""  // Empty photo from friend2
+                                url = ""
                             )
                         )
                     )
@@ -444,13 +444,6 @@ class SocialRepositoryImpl : SocialRepository {
         }
     }
 
-    override suspend fun removeFriend(userId: String) {
-        // Remove from friends list
-        friendUsers.update { currentList ->
-            currentList.filter { it.id != userId }
-        }
-    }
-
     override suspend fun joinCommunity(communityId: String) {
         val communityToJoin = discoveryCommunities.value.find { it.id == communityId }
 
@@ -464,34 +457,6 @@ class SocialRepositoryImpl : SocialRepository {
                 current.filter { it.id != communityId }
             }
         }
-    }
-
-    override suspend fun leaveCommunity(communityId: String) {
-        val communityToLeave = userCommunities.value.find { it.id == communityId }
-
-        communityToLeave?.let { community ->
-            // Remove membership flag and move back to discovery
-            val updatedCommunity = community.copy(isCommunityMember = false)
-            discoveryCommunities.update { current -> current + updatedCommunity }
-
-            // Remove from user communities
-            userCommunities.update { current ->
-                current.filter { it.id != communityId }
-            }
-        }
-    }
-
-
-    override suspend fun selectMissingPhotoForCapture(missingPhotoInfo: MissingPhotoInfo) {
-        selectedMissingPhoto = missingPhotoInfo
-    }
-
-    override suspend fun getSelectedMissingPhoto(): MissingPhotoInfo? {
-        return selectedMissingPhoto
-    }
-
-    override suspend fun clearPhotoSelection() {
-        selectedMissingPhoto = null
     }
 
     override suspend fun updateMemoryPhoto(

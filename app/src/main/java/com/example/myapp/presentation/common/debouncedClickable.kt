@@ -6,16 +6,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 
-/**
- * Extension function to make a Modifier clickable with debounce protection
- * to prevent accidental double-clicks
- */
+
 fun Modifier.debouncedClickable(
     debounceTime: Long = 300L,
     onClick: () -> Unit
 ): Modifier = composed {
     val lastClickTime = remember { java.util.concurrent.atomic.AtomicLong(0) }
-    
+
     clickable(
         indication = null,
         interactionSource = remember { MutableInteractionSource() }

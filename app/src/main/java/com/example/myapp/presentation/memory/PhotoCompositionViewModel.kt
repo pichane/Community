@@ -9,9 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel responsible for managing memory composition screen data
- */
+
 class PhotoCompositionViewModel(
     private val getMemoryUseCase: GetMemoryUseCase
 ) : ViewModel() {
@@ -24,12 +22,6 @@ class PhotoCompositionViewModel(
     private val _communityName = MutableStateFlow("")
     val communityName: StateFlow<String> = _communityName.asStateFlow()
 
-    /**
-     * Loads memory data for display
-     *
-     * @param communityId The ID of the community containing the memory
-     * @param memoryId The ID of the memory to display
-     */
     fun loadMemory(communityId: String, memoryId: String) {
         _uiState.value = MemoryUiState.Loading
 
