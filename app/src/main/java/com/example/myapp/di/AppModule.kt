@@ -19,13 +19,11 @@ import org.koin.dsl.module
 
 val appModule = module {
    // Repositories
-   single<FeedRepository> { FeedRepositoryImpl() }
    single<PhotoRepository> { PhotoRepositoryImpl(get()) }
    single<SocialRepository> { SocialRepositoryImpl() }
    factory { AddMemoryToCommunityUseCase(get()) }
 
    // Use cases
-   factory { GetFeedItemsUseCase(get()) }
    factory { SavePhotoUseCase(get()) }
    factory { GetAllPhotosUseCase(get()) }
    factory { GetPhotoByIdUseCase(get()) }
@@ -39,7 +37,7 @@ val appModule = module {
    factory { GetSelectedMissingPhotoUseCase(get()) }
    factory { GetMemoryUseCase(get()) }
    // ViewModels
-   viewModel { HomeViewModel(get(), get(), get()) }
+   viewModel { HomeViewModel(get(), get()) }
    viewModel { CameraViewModel(get()) }
    viewModel { PhotoDetailViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
    viewModel { SocialViewModel(get()) }

@@ -60,7 +60,6 @@ fun HomeScreen(
     onSocialClick: () -> Unit,
     onMemoryClick: (String, String) -> Unit
 ) {
-    val feedItems by viewModel.feedItems.collectAsState()
     val photos by viewModel.photos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
@@ -96,7 +95,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (isLoading && feedItems.isEmpty()) {
+            if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Center)
                 )
