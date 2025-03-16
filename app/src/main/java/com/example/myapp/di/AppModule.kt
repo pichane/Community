@@ -32,7 +32,6 @@ val appModule = module {
    factory { DeletePhotoUseCase(get()) }
    factory { GetUserCommunitiesUseCase(get()) }
    factory { GetCommunityPhotosUseCase(get()) }
-   factory { GetContestsUseCase(get()) }
    factory { GetMissingPhotoInfoUseCase(get()) }
    factory { UpdateMemoryPhotoUseCase(get()) }
    factory { SelectMissingPhotoUseCase(get()) }
@@ -40,7 +39,7 @@ val appModule = module {
    factory { GetSelectedMissingPhotoUseCase(get()) }
    factory { GetMemoryUseCase(get()) }
    // ViewModels
-   viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
+   viewModel { HomeViewModel(get(), get(), get()) }
    viewModel { CameraViewModel(get()) }
    viewModel { PhotoDetailViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
    viewModel { SocialViewModel(get()) }

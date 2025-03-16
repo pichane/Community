@@ -3,35 +3,53 @@ package com.example.myapp.presentation.home
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import com.example.myapp.domain.model.Photo
-import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.example.myapp.R
-import com.example.myapp.domain.model.Contest
-import com.example.myapp.domain.model.ContestWinner
-import com.example.myapp.domain.model.EmojiType
 import com.example.myapp.domain.model.FromUser
+import com.example.myapp.domain.model.Photo
 import com.example.myapp.presentation.common.debouncedClickable
+import org.koin.androidx.compose.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +58,7 @@ fun HomeScreen(
     onTakePhotoClick: () -> Unit,
     onPhotoClick: (Int) -> Unit,
     onSocialClick: () -> Unit,
-    onMemoryClick: (String, String) -> Unit // Add this parameter
+    onMemoryClick: (String, String) -> Unit
 ) {
     val feedItems by viewModel.feedItems.collectAsState()
     val photos by viewModel.photos.collectAsState()
@@ -72,11 +90,6 @@ fun HomeScreen(
                 }
             )
         },
-        /* floatingActionButton = {
-            FloatingActionButton(onClick = onTakePhotoClick) {
-                Text("Take Photo")
-            }
-        } */
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -169,38 +182,6 @@ fun HomeScreen(
 
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     }
-
-                    // Contest section
-                    item {
-                        Text(
-                            text = "Contests",
-                            style = MaterialTheme.typography.headlineMedium,
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        val contests by viewModel.contests.collectAsState()
-
-                        if (contests.isEmpty()) {
-                            Text(
-                                text = "No contests available right now",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        } else {
-                            // Display contests vertically
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                contests.forEach { contest ->
-                                    ContestRow(contest = contest)
-                                }
-                            }
-                        }
-
-                        Divider(modifier = Modifier.padding(vertical = 16.dp))
-                    }
                 }
             }
         }
@@ -257,15 +238,22 @@ fun PhotoItem(photo: Photo, onClick: () -> Unit) {
             .debouncedClickable { onClick() }
     ) {
         Column {
-            Box(modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = photo.uri,
                         onLoading = { Log.d("PhotoItem", "Loading image: ${photo.uri}") },
-                        onError = { Log.e("PhotoItem", "Error loading image: ${photo.uri}", it.result.throwable) }
+                        onError = {
+                            Log.e(
+                                "PhotoItem",
+                                "Error loading image: ${photo.uri}",
+                                it.result.throwable
+                            )
+                        }
                     ),
                     contentDescription = "Photo ${photo.id}",
                     contentScale = ContentScale.Crop,
@@ -358,6 +346,7 @@ fun PhotoComposition(
                                     modifier = Modifier.fillMaxSize()
                                 )
                             }
+
                             fromUser.userId == mainUserId -> {
                                 // Empty photo from main user - show "ADD" button
                                 Box(
@@ -382,6 +371,7 @@ fun PhotoComposition(
                                     }
                                 }
                             }
+
                             else -> {
                                 // Empty photo from another user - show "Missing friend"
                                 Box(
@@ -400,7 +390,10 @@ fun PhotoComposition(
                         }
                     }
                     if (index < 2) { // Don't add divider after last item
-                        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
@@ -409,9 +402,10 @@ fun PhotoComposition(
             Column(modifier = Modifier.fillMaxSize()) {
                 Row(modifier = Modifier.weight(1f)) {
                     // Top left photo
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     ) {
                         if (photos.isNotEmpty()) {
                             HandlePhotoDisplay(photos[0], mainUserId)
@@ -427,9 +421,10 @@ fun PhotoComposition(
                     )
 
                     // Top right photo
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     ) {
                         if (photos.size > 1) {
                             HandlePhotoDisplay(photos[1], mainUserId)
@@ -443,9 +438,10 @@ fun PhotoComposition(
 
                 Row(modifier = Modifier.weight(1f)) {
                     // Bottom left photo
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     ) {
                         if (photos.size > 2) {
                             HandlePhotoDisplay(photos[2], mainUserId)
@@ -461,11 +457,12 @@ fun PhotoComposition(
 
                     if (photos.size > 3) {
                         // Bottom right photo
-                        Box(modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
                         ) {
-                                HandlePhotoDisplay(photos[3], mainUserId)
+                            HandlePhotoDisplay(photos[3], mainUserId)
                         }
                     }
                 }
@@ -486,6 +483,7 @@ fun HandlePhotoDisplay(photo: FromUser, mainUserId: String) {
                 modifier = Modifier.fillMaxSize()
             )
         }
+
         photo.userId == mainUserId -> {
             // Empty photo from main user - show "ADD" button
             Box(
@@ -512,6 +510,7 @@ fun HandlePhotoDisplay(photo: FromUser, mainUserId: String) {
                 }
             }
         }
+
         else -> {
             // Empty photo from another user - show "Missing friend"
             Box(
@@ -544,94 +543,5 @@ private fun EmptyPhotoPlaceholder() {
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(24.dp)
         )
-    }
-}
-
-@Composable
-fun ContestRow(contest: Contest, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { /* Navigate to contest detail */ },
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Contest title and date
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = contest.title,
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-                Text(
-                    text = dateFormat.format(contest.date),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            HorizontalDivider(thickness = 0.5.dp)
-
-            // Winners row (horizontal)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                contest.winners.forEach { winner ->
-                    WinnerCard(
-                        winner = winner,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun WinnerCard(winner: ContestWinner, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .fillMaxHeight()
-            .clickable { /* Navigate to winner detail */ }
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Photo
-            Image(
-                painter = rememberAsyncImagePainter(model = winner.photoUrl),
-                contentDescription = "Contest winner photo",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            // Emoji badge in the corner
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(8.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)
-            ) {
-                Text(
-                    text = when(winner.emojiType) {
-                        EmojiType.CAMERA -> "📸"
-                        EmojiType.STAR -> "⭐"
-                        EmojiType.JOY -> "😂"
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-        }
     }
 }
