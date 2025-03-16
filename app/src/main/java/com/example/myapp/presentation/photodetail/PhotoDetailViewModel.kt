@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -44,19 +45,22 @@ class PhotoDetailViewModel(
     val userCommunities: StateFlow<List<Community>> = getUserCommunitiesUseCase()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    private val _uiState = MutableStateFlow(PhotoDetailUiState())
+    val uiState: StateFlow<PhotoDetailUiState> = _uiState.asStateFlow()
+
     init {
         loadMissingPhotoInfo()
     }
 
     fun loadPhoto(photoId: Int) {
         viewModelScope.launch {
-            _isLoading.value = true
+            _uiState.update { it.copy(isLoading = true) }
             try {
-                _photo.value = getPhotoByIdUseCase(photoId)
+                val photo = getPhotoByIdUseCase(photoId)
+                _uiState.update { it.copy(photo = photo, isLoading = false) }
             } catch (e: Exception) {
-                // Handle error
-            } finally {
-                _isLoading.value = false
+                Log.e("PhotoDetailViewModel", "Error loading photo", e)
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -175,4 +179,19 @@ class PhotoDetailViewModel(
             }
         }
     }
+}
+
+// In PhotoDetailViewModel.kt
+data class PhotoDetailUiState(
+    val photo: Photo? = null,
+    val isLoading: Boolean = false,
+    val missingPhotoInfo: List<MissingPhotoInfo> = emptyList(),
+    val userCommunities: List<Community> = emptyList(),
+    val showCommunitySelection: Boolean = false,
+    val navigationEvent: NavigationEvent? = null
+)
+
+sealed class NavigationEvent {
+    object NavigateBack : NavigationEvent()
+    object PhotoDeleted : NavigationEvent()
 }

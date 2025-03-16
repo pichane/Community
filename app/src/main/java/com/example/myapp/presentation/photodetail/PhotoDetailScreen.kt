@@ -73,6 +73,7 @@ fun PhotoDetailScreen(
     // Bottom sheet state
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
+    val isNavigating = remember { mutableStateOf(missingPhotoInfo.isNotEmpty()) }
 
     // Load the photo when the screen is first displayed
     LaunchedEffect(photoId) {
@@ -158,7 +159,7 @@ fun PhotoDetailScreen(
                     color = MaterialTheme.colorScheme.surface
                 ) {
                     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                        if (missingPhotoInfo.isNotEmpty()) {
+                        if (isNavigating.value) {
                             // Missing photos section
                             Text(
                                 text = "Use This Photo For",
@@ -178,9 +179,8 @@ fun PhotoDetailScreen(
                                     onBack()
                                 },
                                 onAddToAllClick = {
-                                    // Update all missing photos with current photo
+                                    isNavigating.value = true
                                     viewModel.updateAllMissingPhotos(photo.uri.toString())
-                                    // Navigate back
                                     onBack()
                                 }
                             )
@@ -331,14 +331,13 @@ fun MissingPhotoRow(
         repeat(2 - min(2, missingPhotos.size)) {
             Box(modifier = Modifier.weight(1f))
         }
-        if (missingPhotos.isNotEmpty()) {
-            MissingPhotoItem(
-                name = "Add to all communities",
-                modifier = Modifier.weight(1f),
-                onClick = { onAddToAllClick() },
-                color = MaterialTheme.colorScheme.primaryContainer
-            )
-        }
+
+        MissingPhotoItem(
+            name = "Add to all communities",
+            modifier = Modifier.weight(1f),
+            onClick = { onAddToAllClick() },
+            color = MaterialTheme.colorScheme.primaryContainer
+        )
     }
 }
 
